@@ -13,6 +13,20 @@ dnspython's zone parser, then generate reverse zones by translating
 the A and AAAA RRs in the forward zone into the corresponding PTR RRs.
 """
 
+# Copyright (c) 2017, Grunchweather Associates
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+# AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+
 from dns.rdatatype      import A, AAAA, SOA, NS, PTR
 from argparse           import ArgumentParser, ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter, FileType
 from socket             import inet_ntop, inet_pton, AF_INET, AF_INET6
@@ -390,7 +404,7 @@ class GitView(object):
             logging.getLogger().addHandler(self.file_logger)
         else:
             self.file_logger = None
-        
+
     def log_user_hook_commit(self):
         logger.debug("Original SSH command: %s", os.getenv("SSH_ORIGINAL_COMMAND"))
         logger.debug("authorized_keys command: %s", os.getenv("GIT_REMOTE_ONLY_COMMAND"))
