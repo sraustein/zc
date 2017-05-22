@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+#
+# Restrict an ssh authorized_keys entry to be used only for git push
+# and git fetch.  Use thusly:
+#
+#  command="git-remote-only /path/to/repository.git alice@example.org" ssh-rsa ABCDEF....== alice@example.org dedicated git key
+#
+# You might also want options like no-port-forwarding,no-X11-forwarding,no-agent-forwarding.
+
+import os, sys, shlex
+
+os.environ.update(GIT_REMOTE_ONLY_COMMAND = " ".join(sys.argv))
+
+cmd = shlex.split(os.getenv("SSH_ORIGINAL_COMMAND", ""))
+
+if len(cmd) == 2 and cmd[0] in ("git-upload-pack", "git-receive-pack") and cmd[1] == sys.argv[1]:
+    os.execv("/usr/bin/" + cmd[0], cmd)
+
+sys.exit("Not authorized: {}".format(" ".join(cmd)))
