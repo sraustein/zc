@@ -272,7 +272,7 @@ can specify a useful set of rules, but the author has not tested this.
 The `$RANGE` control operation is a variation on the same general idea
 as the (BIND9-specific) `$GENERATE` control operation, but is, in the
 author's opinion, a bit easier both to use and to read.  For all but
-the most esoteric uses, it takes three of four arguments:
+the most esoteric uses, it takes three or four arguments:
 
 1. A format string to generate the name field of the resulting RRs.
 
@@ -296,7 +296,7 @@ octet of the start address.
 
 Examples:
 
-    ; Access points using generate(). This is equivalent to:
+    ; Access points using $RANGE. This is equivalent to:
     ;
     ;  ap-101           10.0.1.101
     ;  ap-102           10.0.1.102
@@ -305,9 +305,9 @@ Examples:
 
     $RANGE      ap-{:d} 10.0.1.101 10.0.1.200
 
-    ; Switches, also using $RANGE, but with numbering explicitly
-    ; specified rather than inferred from the IPv4 addressing,
-    ; equivalent to:
+    ; Switches, also using $RANGE, but with the numeric input to the
+    ; format string explicitly specified rather than inferred from the
+    ; IPv4 addressing.  Equivalent to:
     ;
     ; sw-1              10.0.3.17
     ; sw-2              10.0.3.18
