@@ -549,6 +549,7 @@ def pre_receive_main():
 
     except Exception as e:
         logger.error("%s", e)
+        sys.exit(1)
 
 def post_receive_main():
     """
@@ -567,7 +568,7 @@ def post_receive_main():
                 f.write(gv.commit + "\n")
     except Exception as e:
         logger.error("%s", e)
-
+        sys.exit(1)
 
 def main():
     """
