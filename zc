@@ -172,6 +172,7 @@ class ZoneGen(object):
         self.origin     = None
         self.cur_origin = None
         self.map        = OrderedDict()
+        self.map_enable = False
         self.reverse    = []
         logger.info("Compiling zone %s", filename)
         try:
