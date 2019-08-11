@@ -1,0 +1,5 @@
+zc (1.0) unstable; urgency=low
+
+  * Add Debian packaging.
+
+ -- Rob Austein <sra@hactrn.net>  Sun, 11 Aug 2019 08:32:15 -0400

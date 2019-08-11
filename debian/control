@@ -1,0 +1,22 @@
+Source: zc
+Maintainer: Rob Austein <sra@hactrn.net>
+Section: python
+Priority: optional
+Build-Depends: dh-python, python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9)
+Standards-Version: 3.9.6
+Homepage: https://git.hactrn.net/sra/zc
+
+Package: python-zc
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, python-dnspython, python-git
+Description: A DNS zone compiler
+ This is a small tool for generating DNS zones from relatively
+ simple text files, with some automation to handle complex or
+ repetitive tasks and to automate generation of reverse zone data.
+ .
+ `zc` can be used either as a straightforward command line tool or as a
+ pair of `pre-receive` and `post-receive` hooks in a bare git
+ repository.  In the latter mode, `zc` pulls its input data and
+ configuration directly from commits pushed to the master branch in the
+ git repository.
+
