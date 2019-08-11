@@ -25,6 +25,62 @@ the push so you can fix them and try again, and output will be
 installed automatically if there were no serious errors.
 
 
+## Installation ##
+
+`zc` is perfectly happy to run directly out of a clone of this source
+code repository, but you can also install it using the usual tools:
+
+### Python setuptools ###
+
+You can install `zc` using the included `setup.py` in the usual
+fashion:
+
+```
+python setup.py build
+python setup.py install
+```
+
+The `setuptools` installation command takes a number of options
+controlling things like whether you're installing to the base system
+location, to a shared add-on location like `/usr/local/`, or to a
+user-specific location.  Run `python setup.py install --help` for
+details.
+
+### Debian packaging ###
+
+The source repository includes a basic Debian package setup for use on
+Debian, Ubuntu, and related systems.  Building Debian packages is a
+complex topic beyond the scope of this document, but if you have the
+usual tools installed, something like this should work:
+
+```
+pdebuild --buildresult ..
+debi --with-depends
+```
+
+You can of course also load the package into an APT repository,
+install it directly with `dpkg -i`, whatever amuses you.
+
+### Dependencies ###
+
+As mentioned above, `zc` depends on `dnspython` and `GitPython`.  Both
+of the packaging methods declare these dependencies in their
+respective packaging structure, but you can also install the
+dependencies directly if neceessary (eg, if running `zc` itself out of
+its source tree).
+
+setuptools:
+```
+pip install dnspython
+pip install GitPython
+```
+
+Debian:
+```
+apt-get install python-dnspython python-git
+```
+
+
 ## Command line use ##
 
 If you just want to use `zc` as a command line tool, it's simple.
@@ -61,6 +117,50 @@ together before writing out any of the zone files.
 
 ## Use as git hooks ##
 
+The following discussion assumes that you're keeping your `zc` input
+files in a git repository.  We are *not* talking about the `zc` source
+repository here: data files should be a *separate* bare git
+repository.  You can put anything you like in that repository so long
+as it obeys the rules below, but in most cases you will just want a
+`config.json` file, one or more `zc` input files, and perhaps a README
+explaining usage details and local conventions.
+
+You'll want to create this repository on the server system where you
+run the DNS name server which will be primary for the zone(s) you
+administer with `zc`, so that it can install its output directly to
+the name server.  If putting something like this on one of your public
+name servers sounds scary, you can set `zc` up on a separate server
+and run that as a stealth primary, with your public name servers as
+secondaries (for the relevant zone(s)) of the stealth primary.
+
+In most cases you'll want to set up a separate userid (`zc`, by
+convention, but use whatever you like) to own the bare git repository,
+so that you can set it up with a locked-down ssh configuration to
+restrict git access to people authorized to change the zone.  The `zc`
+package includes an auxiliary program `git-remote-only` suitable for
+use in `~zc/.ssh/authorized_keys`.
+
+To create a suitable userid and bare repository on Linux, you might do
+something like this:
+
+```
+sudo adduser --disabled-password --gecos 'ZC user' zc
+sudo git init --bare ~zc/dns.git
+sudo mkdir ~zc/.ssh
+sudo chown -R root:root ~zc
+sudo chown -R zc:zc ~zc/dns.git
+sudo ln -s /usr/bin/zc ~zc/dns.git/hooks/pre-receive
+sudo ln -s /usr/bin/zc ~zc/dns.git/hooks/post-receive
+```
+
+You'll need to populate `~zc/.ssh/authorized_keys` to set up keys for
+users who are allowed to use this repository.
+`~zc/.ssh/authorized_keys` must be *readable* by user `zc`, but need
+not be writable by user `zc`, so the ssh configuration can be owned by
+root, and since it only contains public keys there's no particular
+harm in making it world readable.  See comments in `git-remote-only`
+for details on how to use that script.
+
 When used as git hooks, configuration can't come from the command
 line, so it comes from two places:
 
@@ -74,10 +174,10 @@ data owner is controlled by `config.json`, while stuff that should be
 controlled by the server operator is controlled by configuration
 variables in the server git repository.  These are described below.
 
-The general idea is that we want to make sure that the zones compile
-correctly *before* allowing the `git push` operation to complete,
-then, assuming everything's OK, we want to install the zones *after*
-the commit completes.
+We want to make sure that the zones compile correctly *before*
+allowing the `git push` operation to complete, then, assuming
+everything's OK, we want to install the zones *after* the commit
+completes.
 
 All the real work happens in the `pre-receive` hook, the
 `post-receive` hook's job is just to trigger final installation of the
@@ -384,7 +484,7 @@ The basic strategy is:
 
 ## Copyright ##
 
-Copyright (c) 2017, Grunchweather Associates
+Copyright (c) 2017-2019, Grunchweather Associates
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
