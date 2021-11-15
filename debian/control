@@ -2,13 +2,13 @@ Source: zc
 Maintainer: Rob Austein <sra@hactrn.net>
 Section: python
 Priority: optional
-Build-Depends: dh-python, python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9)
+Build-Depends: dh-python, python3-setuptools (>= 0.6b3), python3-all (>= 2.6.6-3), debhelper (>= 9)
 Standards-Version: 3.9.6
 Homepage: https://git.hactrn.net/sra/zc
 
-Package: python-zc
+Package: python3-zc
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-dnspython, python-git
+Depends: ${misc:Depends}, ${python3:Depends}, python3-dnspython, python3-git
 Description: A DNS zone compiler
  This is a small tool for generating DNS zones from relatively
  simple text files, with some automation to handle complex or

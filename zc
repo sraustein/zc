@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Generate zone files from a simpl(er) flat text file.
@@ -28,7 +28,8 @@ the A and AAAA RRs in the forward zone into the corresponding PTR RRs.
 # PERFORMANCE OF THIS SOFTWARE.
 
 from dns.rdatatype      import A, AAAA, SOA, NS, PTR
-from argparse           import ArgumentParser, ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter, FileType
+from argparse           import ArgumentParser, ArgumentDefaultsHelpFormatter, \
+                               RawDescriptionHelpFormatter, FileType
 from socket             import inet_ntop, inet_pton, AF_INET, AF_INET6
 from collections        import OrderedDict
 
@@ -58,7 +59,7 @@ log_levels = OrderedDict((logging.getLevelName(i).lower(), i)
                          for i in (logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR))
 
 
-class Address(long):
+class Address(int):
     """
     Addresses are integers with some extra code to handle conversion
     to and from text strings.
@@ -67,24 +68,19 @@ class Address(long):
     def __new__(cls, x):
         if cls is Address and issubclass(x.__class__, Address):
             cls = x.__class__
-        if isinstance(x, (str, unicode)):
+        if isinstance(x, str):
             if cls is Address:
                 cls = V6 if ":" in x else V4
-            x = int(inet_pton(cls.af, str(x)).encode("hex"), 16)
-        return long.__new__(cls, x)
+            x = int.from_bytes(inet_pton(cls.af, str(x)), "big")
+        return int.__new__(cls, x)
 
-    @property
-    def _bytestring(self):
+    def __bytes__(self):
         if self < 0:
             raise ValueError("value out of range")
-        return "{0:0{1}x}".format(self, self.bits / 4).decode("hex")
+        return self.to_bytes(self.bits // 8, "big")
 
     def __str__(self):
-        return inet_ntop(self.af, self._bytestring)
-
-    @property
-    def bytes(self):
-        return tuple(ord(b) for b in self._bytestring)
+        return inet_ntop(self.af, bytes(self))
 
     @property
     def mask(self):
@@ -111,7 +107,7 @@ class Prefix(object):
     """
 
     def __init__(self, x, y = None):
-        if isinstance(x, (str, unicode)) and y is None:
+        if isinstance(x, str) and y is None:
             x, y = x.split("/")
         self.net = Address(x)
         self.len = int(y)
@@ -125,9 +121,6 @@ class Prefix(object):
         return hash(self.net) ^ hash(self.len)
 
     def __int__(self):
-        return self.net
-
-    def __long__(self):
         return self.net
 
     def __str__(self):
@@ -227,9 +220,9 @@ class ZoneGen(object):
             name = name, addr = addr, comment = comment))
 
     def map_rr(self, name, addr, comment = ""):
-        for prefix, format in self.map.iteritems():
+        for prefix, format in self.map.items():
             if prefix.matches(addr):
-                self.rr(name, Address(format.format(addr.bytes)), comment)
+                self.rr(name, Address(format.format(bytes(addr))), comment)
                 break
 
     def to_file(self, f, relativize = None):
@@ -267,10 +260,10 @@ class ZoneGen(object):
     def handle_RANGE(self, fmt, start, stop, offset = None, multiplier = None, mapaddr = None):
         start = Address(start)
         stop  = Address(stop)
-        offset = start.bytes[-1] if offset is None else int(offset, 0)
+        offset = bytes(start)[-1] if offset is None else int(offset, 0)
         multiplier = 1 if multiplier is None else int(multiplier, 0)
         method = self.rr if mapaddr is None or not self.get_mapping_state(mapaddr) else self.map_rr
-        for i in xrange(stop - start + 1):
+        for i in range(stop - start + 1):
             method(fmt.format(offset + i), start.__class__(start + i * multiplier))
 
     def handle_REVERSE_ZONE(self, *names):
@@ -329,7 +322,7 @@ class ZoneHerd(object):
 
         pid = os.getpid()
 
-        for z in reverse.values() + forward:
+        for z in list(reverse.values()) + forward:
             fn  = z.origin.to_text(omit_final_dot = True)
             tfn = ".~{}~{}~{}".format(pid, tempword, fn)
             self.names[tfn] = fn
