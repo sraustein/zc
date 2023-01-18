@@ -423,12 +423,26 @@ Examples:
     $RANGE dhcp-f{:03x} 10.1.0.50 10.2.255.254 50
 
 
-#### `$INCLUDE` and `$GENERATE` ####
+#### `$INCLUDE` ####
 
-The `$INCLUDE` and `$GENERATE` control operators are not currently implemented.
+`$INCLUDE` is a standard control operator, but for the main expected
+`zc` use cases there's not much need for it.
 
-`$INCLUDE` is a standard control operator, but we appear to have no
-current need for it.
+`zc` supports a limited form of the `$INCLUDE` operator, intended
+mainly for automation (that is, for cases where one wants to include a
+machine-generated set of DNS data into a larger zone that you're
+maintaining with `zc`).  Limitations:
+
+1. `zc` doesn't support the optional `origin` field of the `$INCLUDE`
+   operator as defined in RFC 1035.
+
+2. `zc` does *not* preserve the current `$ORIGIN` value of the outer
+   file while processing `$INCLUDE`, so if the included file changes
+   the `$ORIGIN`, the outer file will see that change.  Don't do that.
+
+#### `$GENERATE` ####
+
+The `$GENERATE` control operators is not currently implemented.
 
 `$GENERATE` is a BIND-specific control operator.  We could implement
 it if there were a real need, but the `$RANGE` operator covers the
