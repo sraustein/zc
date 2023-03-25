@@ -442,14 +442,14 @@ maintaining with `zc`).  Limitations:
 
 #### `$GENERATE` ####
 
-The `$GENERATE` control operators is not currently implemented.
+The `$GENERATE` control operator is not currently implemented.
 
 `$GENERATE` is a BIND-specific control operator.  We could implement
 it if there were a real need, but the `$RANGE` operator covers the
 things for which we have been using `$GENERATE` in the forward zone.
 
-Our current use of `$GENERATE` in reverse zones is a source of
-consistency problems, and is therefore unsupported with prejudice.
+The IETF NOC's former use of `$GENERATE` in reverse zones was a source
+of consistency problems, and is therefore unsupported with prejudice.
 
 
 #### `$REVERSE_ZONE` ####
